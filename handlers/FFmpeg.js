@@ -55,13 +55,14 @@ async function init () {
 
 async function doConvert (inputFile, inputFormat, outputFormat) {
 
-  await ffmpeg.writeFile(inputFile.name, await fetchFile(inputFile));
+  await ffmpeg.writeFile(inputFile.name, inputFile.bytes);
   await ffmpeg.exec(["-i", inputFile.name, "-f", outputFormat.internal, "output"]);
-  return (await ffmpeg.readFile("output"))?.buffer;
+  return new Uint8Array((await ffmpeg.readFile("output"))?.buffer);
 
 }
 
 export default {
+  name: "FFmpeg",
   init,
   supportedFormats,
   doConvert

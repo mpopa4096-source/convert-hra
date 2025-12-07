@@ -93,7 +93,7 @@ Promise.all(initPromises).then(() => {
       const newOption = document.createElement("button");
       newOption.setAttribute("format-index", allOptions.length - 1);
       newOption.setAttribute("mime-type", format.mime);
-      newOption.appendChild(document.createTextNode(format.name + (format.mime ? ` (${format.mime})` : "")));
+      newOption.appendChild(document.createTextNode(format.name + ` (${format.mime}) ${handler.name}`));
 
       const clickHandler = (event) => {
         const previous = event.target.parentElement.getElementsByClassName("selected")?.[0];
@@ -129,6 +129,61 @@ Promise.all(initPromises).then(() => {
 
 });
 
+async function attemptConvertPath (inputFile, path) {
+
+  const file = { bytes: inputFile.bytes, name: inputFile.name };
+
+  for (let i = 0; i < path.length - 1; i ++) {
+    try {
+      file.bytes = await path[i + 1].handler.doConvert(file, path[i].format, path[i + 1].format);
+      if (!file.bytes.length) throw "Output is empty.";
+      file.name = file.name.split(".")[0] + "." + path[i + 1].format.extension;
+    } catch (e) {
+      // console.error(e);
+      return null;
+    }
+  }
+
+  return { file, path };
+
+}
+
+async function buildConvertPath (file, target, path = []) {
+
+  if (path.length >= 3) return null;
+
+  const previous = path[path.length - 1];
+
+  // Check if the target supports parsing *from* the previous node's format
+  if (target.handler.supportedFormats.some(c => c.mime === previous.format.mime && c.from)) {
+    path.push(target);
+    return await attemptConvertPath(file, path);
+  }
+
+  // Get handlers that support *taking in* the previous format
+  // Note that this will of course exclude the target handler
+  const validHandlers = handlers.filter(handler => (
+    handler.supportedFormats.some(format => (
+      format.mime === previous.format.mime &&
+      format.from
+    ))
+  ));
+
+  // Look for untested mime types among valid handlers and recurse
+  for (const handler of validHandlers) {
+    for (const format of handler.supportedFormats) {
+      if (!format.to) continue;
+      if (!format.mime) continue;
+      if (path.some(c => c.format === format)) continue;
+      const attempt = await buildConvertPath(file, target, path.concat({ format, handler }));
+      if (attempt) return attempt;
+    }
+  }
+
+  return null;
+
+}
+
 window.convertSelection = async function () {
 
   const inputFile = selectedFile;
@@ -144,22 +199,27 @@ window.convertSelection = async function () {
   if (!outputButton) return alert("Specify output file format.");
 
   const inputOption = allOptions[Number(inputButton.getAttribute("format-index"))];
-  const inputFormat = inputOption.format;
   const outputOption = allOptions[Number(outputButton.getAttribute("format-index"))];
+
+  const inputBuffer = await inputFile.arrayBuffer();
+  const inputBytes = new Uint8Array(inputBuffer);
+
+  const inputFileData = { name: inputFile.name, bytes: inputBytes };
+
+  const output = await buildConvertPath(inputFileData, outputOption, [inputOption]);
+  if (!output) return alert("Failed to find conversion route.");
+
   const outputFormat = outputOption.format;
 
-  let outputData;
-  try {
-    outputData = await inputOption.handler.doConvert(inputFile, inputFormat, outputFormat);
-  } catch (e) {
-    alert(e.message);
-    return;
-  }
-
-  const blob = new Blob([outputData], {type: outputFormat.mime} );
+  const blob = new Blob([output.file.bytes], { type: outputFormat.mime });
   const link = document.createElement("a");
   link.href = window.URL.createObjectURL(blob);
-  link.download = inputFile.name.split(".")[0] + "." + outputFormat.extension;
+  link.download = output.file.name;
   link.click();
+
+  alert(
+    `Converted ${inputOption.format.format} to ${outputOption.format.format}!\n` +
+    `Path used: ${output.path.map(c => c.format.format).join(" -> ")}`
+  );
 
 }

@@ -96,12 +96,34 @@ async function init () {
 
 }
 
-async function doConvert (inputFile, inputFormat, outputFormat) {
+async function doConvert (inputFile, inputFormat, outputFormat, retryWithArgs = null) {
 
   await ffmpeg.load();
 
+  let stdout = "";
+  const readStdout = ({ message }) => stdout += message + "\n";
+
+  const command = ["-hide_banner", "-i", inputFile.name, "-f", outputFormat.internal];
+  if (retryWithArgs) command.push(...retryWithArgs);
+  command.push("output");
+
+  ffmpeg.on("log", readStdout);
   await ffmpeg.writeFile(inputFile.name, new Uint8Array(inputFile.bytes));
+  await ffmpeg.exec(command);
   await ffmpeg.deleteFile(inputFile.name);
+  ffmpeg.off("log", readStdout);
+
+  if (stdout.includes("Conversion failed!\n")) {
+
+    if (!retryWithArgs) {
+      if (stdout.includes("Valid sizes are")) {
+        const newSize = stdout.split("Valid sizes are ")[1].split(".")[0].split(" ").pop();
+        return doConvert(inputFile, inputFormat, outputFormat, ["-s", newSize]);
+      }
+    }
+
+    throw stdout;
+  }
 
   const bytes = new Uint8Array((await ffmpeg.readFile("output"))?.buffer);
   await ffmpeg.deleteFile("output");

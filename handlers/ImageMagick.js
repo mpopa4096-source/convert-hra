@@ -75,12 +75,23 @@ async function init () {
 
 }
 
-async function doConvert (inputFile, inputFormat, outputFormat) {
+async function doConvert (inputFile, inputFormat, outputFormat, retryWithArgs = null) {
+
+  const command = ["convert", inputFile.name];
+  if (retryWithArgs) command.push(...retryWithArgs);
+  command.push(`${outputFormat.internal}:out`);
 
   const image = { name: inputFile.name, content: new Uint8Array(inputFile.bytes) };
   const result = await Magick.call([image], command);
 
   if (result.exitCode !== 0) {
+
+    if (!retryWithArgs) {
+      if (result.stderr[0].includes("WidthOrHeightExceedsLimit")) {
+        return await doConvert(inputFile, inputFormat, outputFormat, ["-resize", "256x256"]);
+      }
+    }
+
     throw result.stderr.join("\n");
   }
 

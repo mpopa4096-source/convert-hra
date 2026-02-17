@@ -18,6 +18,7 @@ import markdownHandler from "./markdown.ts";
 import vtfHandler from "./vtf.ts";
 import mcMapHandler from "./mcmap.ts";
 import jszipHandler from "./jszip.ts";
+import peToZipHandler from "./petozip.ts";
 import flptojsonHandler from "./flptojson.ts";
 import floHandler from "./flo.ts";
 
@@ -40,6 +41,7 @@ try { handlers.push(new markdownHandler()) } catch (_) { };
 try { handlers.push(new vtfHandler()) } catch (_) { };
 try { handlers.push(new mcMapHandler()) } catch (_) { };
 try { handlers.push(new jszipHandler()) } catch (_) { };
+try { handlers.push(new peToZipHandler()) } catch (_) { };
 try { handlers.push(new flptojsonHandler()) } catch (_) { };
 try { handlers.push(new floHandler()) } catch (_) { };
 

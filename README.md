@@ -3,7 +3,7 @@
 
 Many online file conversion tools are **boring** and **insecure**. They only allow conversion between two formats in the same medium (images to images, videos to videos, etc.), and they require that you _upload your files to some server_.
 
-This is not just terrible for privacy, it's also incredibly lame. What if you _really_ need to convert an AVI video to a PDF document? Try to find an online tool for that, I dare you.
+This is not just terrible for privacy, it's also incredibly lame. What if you _really_ need to convert an AVI video to a PDF document or a SRT subtitle file to a XCC subtitle file? Try to find an online tool for that, I dare you.
 
 [Convert.to.it](https://convert.to.it/) aims to be a tool that "just works". You're almost _guaranteed_ to get an output - perhaps not always the one you expected, but it'll try its best to not leave you hanging.
 

@@ -21,7 +21,7 @@ interface XCCLine {
 }
 
 class subtitlyHandler implements FormatHandler {
-  public name: string = "subtitly";
+  public name: string = "Subtitly";
   public supportedFormats?: FileFormat[];
   public ready: boolean = false;
 
@@ -36,15 +36,6 @@ class subtitlyHandler implements FormatHandler {
         to: true,
         internal: "xcc"
       },
-      {
-        name: "SubRip subtitle",
-        format: "SRT",
-        extension: "srt",
-        mime: "application/x-subrip",
-        from: true,
-        to: true,
-        internal: "srt"
-      }
     ];
     this.ready = true;
   }

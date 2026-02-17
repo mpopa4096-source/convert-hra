@@ -175,6 +175,16 @@ class FFmpegHandler implements FormatHandler {
       internal: "mov"
     });
 
+    this.supportedFormats.push({
+      name: "MPEG-4 Timed Text subtitle",
+      format: "tx3g",
+      extension: "tx3g",
+      mime: "text/x-tx3g",
+      from: true,
+      to: false,
+      internal: "mp4"
+    });
+
     this.#ffmpeg.terminate();
 
     this.ready = true;

@@ -16,6 +16,7 @@ import threejsHandler from "./threejs.ts";
 import sqlite3Handler from "./sqlite.ts";
 import markdownHandler from "./markdown.ts";
 import vtfHandler from "./vtf.ts";
+import mcMapHandler from "./mcmap.ts";
 import jszipHandler from "./jszip.ts";
 
 const handlers: FormatHandler[] = [];
@@ -35,6 +36,7 @@ try { handlers.push(new threejsHandler()) } catch (_) { };
 try { handlers.push(new sqlite3Handler()) } catch (_) { };
 try { handlers.push(new markdownHandler()) } catch (_) { };
 try { handlers.push(new vtfHandler()) } catch (_) { };
+try { handlers.push(new mcMapHandler()) } catch (_) { };
 try { handlers.push(new jszipHandler()) } catch (_) { };
 
 export default handlers;

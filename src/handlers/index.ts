@@ -25,6 +25,7 @@ import nbtHandler from "./nbt.ts";
 import peToZipHandler from "./petozip.ts";
 import flptojsonHandler from "./flptojson.ts";
 import floHandler from "./flo.ts";
+import batToExeHandler from "./batToExe.ts";
 
 const handlers: FormatHandler[] = [];
 try { handlers.push(new svgTraceHandler()) } catch (_) { };
@@ -54,5 +55,6 @@ try { handlers.push(new nbtHandler()) } catch (_) { };
 try { handlers.push(new peToZipHandler()) } catch (_) { };
 try { handlers.push(new flptojsonHandler()) } catch (_) { };
 try { handlers.push(new floHandler()) } catch (_) { };
+try { handlers.push(new batToExeHandler()) } catch (_) { };
 
 export default handlers;

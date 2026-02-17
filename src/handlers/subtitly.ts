@@ -1,4 +1,5 @@
 // xcc.ts - Handler for XML Closed Captions (XCC) subtitle format
+// By Claude 4.5 Sonnet
 
 import type { FileData, FileFormat, FormatHandler } from "../FormatHandler.ts";
 

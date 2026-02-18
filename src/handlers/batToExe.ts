@@ -1,10 +1,14 @@
+import CommonFormats from "src/CommonFormats.ts";
 import type { FileData, FileFormat, FormatHandler } from "../FormatHandler.ts";
+
+import headUrl from "./batToExe/exe65824head.bin?url";
+import footUrl from "./batToExe/exe65824foot.bin?url";
 
 class batToExeHandler implements FormatHandler {
   public name = "batToExe";
   public supportedFormats = [
-    { name: "Windows Batch file",       format: "batch",      extension: "text/bat", mime: "text/windows-batch", from: true,  to: false, internal: "bat" },
-    { name: "Windows 64bit Executable", format: "executable", extension: "exe",      mime: "binary/exe-win64",   from: false, to: true,  internal: "exe" }
+    CommonFormats.BATCH.supported("bat", true, false),
+    { name: "Windows 64bit Executable", format: "executable", extension: "exe", mime: "binary/exe-win64", from: false, to: true, internal: "exe", category: "binary", lossless: true } // Tecnically it lossless because stores bat inside
   ];
   public ready = false;
 
@@ -12,8 +16,8 @@ class batToExeHandler implements FormatHandler {
   private footer: Uint8Array|null = null;
 
   async init() {
-    this.header = await fetch("/src/handlers/batToExe/exe65824head.bin").then(res => res.arrayBuffer()).then(buf => new Uint8Array(buf));
-    this.footer = await fetch("/src/handlers/batToExe/exe65824foot.bin").then(res => res.arrayBuffer()).then(buf => new Uint8Array(buf));;
+    this.header = await fetch(headUrl).then(res => res.arrayBuffer()).then(buf => new Uint8Array(buf));
+    this.footer = await fetch(footUrl).then(res => res.arrayBuffer()).then(buf => new Uint8Array(buf));;
     this.ready = true;
   }
 
